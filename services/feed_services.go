@@ -48,19 +48,8 @@ func getPostRelations(
 }
 
 func serializeSong(song models.SongWithMeta) r.SongJson {
-	// TODO: is this really worth the boilerplate or should i make (some?) models
-	// serializable
 	songJson := r.SongJson{
-		Id:            song.Id,
-		Title:         song.Title,
-		Artists:       song.Artists,
-		IsLiked:       song.IsLiked,
-		LikeCount:     song.LikeCount,
-		Album:         song.Album,
-		AlbumArt:      song.AlbumArt,
-		SpotifyId:     song.SpotifyId,
-		AppleMusicId:  song.AppleMusicId,
-		AppleMusicUrl: song.AppleMusicUrl,
+		SongWithMeta: song,
 	}
 
 	return songJson
@@ -68,14 +57,7 @@ func serializeSong(song models.SongWithMeta) r.SongJson {
 
 func serializeMixtape(mixtape models.MixtapePreview) r.MixtapePreviewJson {
 	return r.MixtapePreviewJson{
-		Id:          mixtape.Id,
-		CreatedAt:   mixtape.CreatedAt,
-		Title:       mixtape.Title,
-		Slug:        mixtape.Slug,
-		UserId:      mixtape.UserId,
-		PublishedAt: mixtape.PublishedAt.Time,
-		SongCount:   mixtape.SongCount,
-		AuthorName:  mixtape.AuthorName,
+		MixtapePreview: mixtape,
 	}
 }
 
