@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/Rican7/conjson"
@@ -10,19 +11,50 @@ import (
 	"github.com/go-chi/render"
 )
 
-type ErrInvalidParameter struct {
-	Code   string
+type ErrResponse struct {
+	StatusCode int `json:"-"`
+
+	Error Err
+}
+
+func (e ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	render.Status(r, e.StatusCode)
+	return nil
+}
+
+type Err struct {
+	Code        string
+	Description string
+	Detail      interface{}
+}
+
+type InvalidParameterDetail struct {
 	Name   string
 	Reason string
 }
 
-func CreateErrInvalidParameter(name string, reason string) ErrInvalidParameter {
-	return ErrInvalidParameter{Code: "INVALID_PARAMETER", Name: name, Reason: reason}
+func CreateErrInvalidParameter(name string, reason string) ErrResponse {
+	return ErrResponse{
+		StatusCode: 400,
+		Error: Err{
+			Code:        "INVALID_PARAMETER",
+			Description: "Could not parse invalid parameter",
+			Detail: InvalidParameterDetail{
+				Name:   name,
+				Reason: reason,
+			},
+		},
+	}
 }
 
-func (e *ErrInvalidParameter) Render(w http.ResponseWriter, r *http.Request) error {
-	render.Status(r, 400)
-	return nil
+func CreateErrNotFound(resourceName string) ErrResponse {
+	return ErrResponse{
+		StatusCode: 404,
+		Error: Err{
+			Code:        "NOT_FOUND",
+			Description: fmt.Sprintf("%s not found", resourceName),
+		},
+	}
 }
 
 // Conjson is a JSON serializer that uses reflection to automagically turn

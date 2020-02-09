@@ -5,11 +5,13 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
+	"github.com/thomasboyt/jam-buds-golang/resources"
 	"github.com/thomasboyt/jam-buds-golang/services"
 )
 
-func parseTimestamp(query url.Values, name string) (*time.Time, *ErrInvalidParameter) {
+func parseTimestamp(query url.Values, name string) (*time.Time, *ErrResponse) {
 	value := query.Get(name)
 	if value == "" {
 		return nil, nil
@@ -22,7 +24,7 @@ func parseTimestamp(query url.Values, name string) (*time.Time, *ErrInvalidParam
 	return &timestamp, nil
 }
 
-func parseTimestamps(query url.Values) (*time.Time, *time.Time, *ErrInvalidParameter) {
+func parseTimestamps(query url.Values) (*time.Time, *time.Time, *ErrResponse) {
 	beforeTimestamp, err := parseTimestamp(query, "before")
 	if err != nil {
 		return nil, nil, err
@@ -47,5 +49,35 @@ func (a *API) GetPublicFeedHandler() http.HandlerFunc {
 		feedItems := services.GetPublicFeed(a.store, beforeTimestamp, afterTimestamp)
 
 		RenderConjson(w, r, feedItems)
+	}
+}
+
+func (a *API) GetUserPlaylist() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userName := chi.URLParam(r, "userName")
+		userProfile := services.GetUserProfileByUserName(a.store, userName)
+
+		if userProfile == nil {
+			err := CreateErrNotFound("user")
+			render.Render(w, r, err)
+			return
+		}
+
+		query := r.URL.Query()
+
+		beforeTimestamp, afterTimestamp, err := parseTimestamps(query)
+		if err != nil {
+			render.Render(w, r, *err)
+			return
+		}
+
+		feedItems := services.GetUserPlaylist(a.store, userProfile.Id, beforeTimestamp, afterTimestamp)
+
+		resp := resources.PlaylistJson{
+			Items:       feedItems,
+			UserProfile: *userProfile,
+		}
+
+		RenderConjson(w, r, resp)
 	}
 }

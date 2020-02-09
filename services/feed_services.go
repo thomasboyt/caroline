@@ -8,6 +8,8 @@ import (
 	"github.com/thomasboyt/jam-buds-golang/store"
 )
 
+const CURRENT_USER_ID_PLACEHOLDER = 4
+
 func mapSongsById(songs []models.SongWithMeta) map[int32]models.SongWithMeta {
 	m := make(map[int32]models.SongWithMeta)
 	for _, song := range songs {
@@ -24,7 +26,28 @@ func mapMixtapesById(mixtapes []models.MixtapePreview) map[int32]models.MixtapeP
 	return m
 }
 
-func getPostRelations(
+func getRelationsForPosts(store *store.Store, posts []models.PostWithConnections) (map[int32]models.SongWithMeta, map[int32]models.MixtapePreview) {
+	songIds := make([]int32, 0)
+	mixtapeIds := make([]int32, 0)
+	for _, post := range posts {
+		if post.GetSongId().Valid {
+			songIds = append(songIds, post.GetSongId().Int32)
+		}
+		if post.GetMixtapeId().Valid {
+			mixtapeIds = append(mixtapeIds, post.GetMixtapeId().Int32)
+		}
+	}
+
+	songs := store.GetSongsByIdList(songIds, CURRENT_USER_ID_PLACEHOLDER)
+	songsById := mapSongsById(songs)
+
+	mixtapes := store.GetMixtapePreviewsByIdList(mixtapeIds)
+	mixtapesById := mapMixtapesById(mixtapes)
+
+	return songsById, mixtapesById
+}
+
+func getPostRelationsFromMaps(
 	post models.AggregatedPost,
 	songsById map[int32]models.SongWithMeta,
 	mixtapesById map[int32]models.MixtapePreview,
@@ -64,26 +87,14 @@ func serializeMixtape(mixtape models.MixtapePreview) r.MixtapePreviewJson {
 func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestamp *time.Time) []r.FeedItemJson {
 	posts := store.GetAggregatedPublicPosts(beforeTimestamp, afterTimestamp, 20)
 
-	songIds := make([]int32, 0)
-	for _, post := range posts {
-		if post.SongId.Valid {
-			songIds = append(songIds, post.SongId.Int32)
-		}
+	// cast []posts -> []postsWithConnections interface
+	// https://stackoverflow.com/questions/12994679/slice-of-struct-slice-of-interface-it-implements
+	postsWithConnections := make([]models.PostWithConnections, len(posts))
+	for i, post := range posts {
+		postsWithConnections[i] = post
 	}
 
-	songs := store.GetSongsByIdList(songIds, 4)
-	songsById := mapSongsById(songs)
-
-	mixtapeIds := make([]int32, 0)
-	for _, post := range posts {
-		if post.MixtapeId.Valid {
-			mixtapeIds = append(mixtapeIds, post.MixtapeId.Int32)
-		}
-	}
-
-	mixtapes := store.GetMixtapePreviewsByIdList(mixtapeIds)
-	mixtapesById := mapMixtapesById(mixtapes)
-
+	songsById, mixtapesById := getRelationsForPosts(store, postsWithConnections)
 	feedItems := []r.FeedItemJson{}
 
 	for _, post := range posts {
@@ -92,7 +103,7 @@ func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestam
 			UserNames: post.UserNames,
 		}
 
-		song, mixtape := getPostRelations(post, songsById, mixtapesById)
+		song, mixtape := getPostRelationsFromMaps(post, songsById, mixtapesById)
 		item.Song = song
 		item.Mixtape = mixtape
 
@@ -100,4 +111,32 @@ func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestam
 	}
 
 	return feedItems
+}
+
+func GetUserPlaylist(store *store.Store, userId int32, beforeTimestamp *time.Time, afterTimestamp *time.Time) []r.PlaylistItemJson {
+	posts := store.GetUserPostsByUserId(userId, beforeTimestamp, afterTimestamp, 20)
+
+	// cast []posts -> []postsWithConnections interface
+	// https://stackoverflow.com/questions/12994679/slice-of-struct-slice-of-interface-it-implements
+	postsWithConnections := make([]models.PostWithConnections, len(posts))
+	for i, post := range posts {
+		postsWithConnections[i] = post
+	}
+
+	songsById, mixtapesById := getRelationsForPosts(store, postsWithConnections)
+	playlistItems := []r.PlaylistItemJson{}
+
+	for _, post := range posts {
+		item := r.PlaylistItemJson{
+			Timestamp: post.Timestamp,
+		}
+
+		song, mixtape := getPostRelationsFromMaps(post, songsById, mixtapesById)
+		item.Song = song
+		item.Mixtape = mixtape
+
+		playlistItems = append(playlistItems, item)
+	}
+
+	return playlistItems
 }

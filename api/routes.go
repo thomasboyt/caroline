@@ -6,4 +6,5 @@ import (
 
 func (a *API) RegisterRoutes(r *chi.Mux) {
 	r.Get("/public-feed", a.GetPublicFeedHandler())
+	r.Get("/playlists/{userName}", a.GetUserPlaylist())
 }

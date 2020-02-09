@@ -20,3 +20,14 @@ type FeedItemJson struct {
 	Song      *SongJson
 	Mixtape   *MixtapePreviewJson
 }
+
+type PlaylistItemJson struct {
+	Timestamp time.Time
+	Song      *SongJson
+	Mixtape   *MixtapePreviewJson
+}
+
+type PlaylistJson struct {
+	Items       []PlaylistItemJson
+	UserProfile UserProfileJson
+}
