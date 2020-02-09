@@ -2,7 +2,6 @@ package store
 
 import (
 	"log"
-	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -12,8 +11,7 @@ type Store struct {
 	db *sqlx.DB
 }
 
-func New() *Store {
-	dsn := os.Getenv("DATABASE_URL")
+func New(dsn string) *Store {
 	dbx, err := sqlx.Connect("postgres", dsn)
 
 	if err != nil {

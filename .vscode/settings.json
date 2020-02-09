@@ -9,10 +9,10 @@
     "editor.codeActionsOnSave": {
       "source.organizeImports": true,
     },
-    "editor.codeActionsOnSaveTimeout": 3000
+    "editor.codeActionsOnSaveTimeout": 3000,
   },
   "gopls": {
-    "usePlaceholders": true, // add parameter placeholders when completing a function
+    "usePlaceholders": false, // add parameter placeholders when completing a function
 
     // Experimental settings
     "completeUnimported": true, // autocomplete unimported packages

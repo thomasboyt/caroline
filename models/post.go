@@ -1,10 +1,11 @@
 package models
 
-import "time"
+import (
+	"database/sql"
+	"time"
 
-import "database/sql"
-
-import "github.com/lib/pq"
+	"github.com/lib/pq"
+)
 
 type Post struct {
 	Id        int32         `db:"id"`

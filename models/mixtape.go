@@ -1,8 +1,9 @@
 package models
 
-import "time"
-
-import "database/sql"
+import (
+	"database/sql"
+	"time"
+)
 
 type Mixtape struct {
 	Id          int32        `db:"id"`

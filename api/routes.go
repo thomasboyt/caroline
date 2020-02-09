@@ -5,5 +5,5 @@ import (
 )
 
 func (a *API) RegisterRoutes(r *chi.Mux) {
-	r.Get("/public-feed", a.GetPublicFeed())
+	r.Get("/public-feed", a.GetPublicFeedHandler())
 }

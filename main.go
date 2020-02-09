@@ -32,8 +32,11 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.URLFormat)
 	r.Use(render.SetContentType(render.ContentTypeJSON))
+	render.Respond = api.RenderConjson
 
-	store := store.New()
+	dsn := os.Getenv("DATABASE_URL")
+	store := store.New(dsn)
+
 	a := api.New(store)
 	a.RegisterRoutes(r)
 
