@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	"github.com/thomasboyt/jam-buds-golang/resources"
+	re "github.com/thomasboyt/jam-buds-golang/resources"
 	"github.com/thomasboyt/jam-buds-golang/services"
 )
 
@@ -73,7 +73,7 @@ func (a *API) GetUserPlaylist() http.HandlerFunc {
 
 		feedItems := services.GetUserPlaylist(a.store, userProfile.Id, beforeTimestamp, afterTimestamp)
 
-		resp := resources.PlaylistJson{
+		resp := re.PlaylistJson{
 			Items:       feedItems,
 			UserProfile: *userProfile,
 		}

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/thomasboyt/jam-buds-golang/models"
-	r "github.com/thomasboyt/jam-buds-golang/resources"
+	re "github.com/thomasboyt/jam-buds-golang/resources"
 	"github.com/thomasboyt/jam-buds-golang/store"
 )
 
@@ -51,16 +51,16 @@ func getPostRelationsFromMaps(
 	post models.AggregatedPost,
 	songsById map[int32]models.SongWithMeta,
 	mixtapesById map[int32]models.MixtapePreview,
-) (*r.SongJson, *r.MixtapePreviewJson) {
+) (*re.SongJson, *re.MixtapePreviewJson) {
 
-	var serializedSong *r.SongJson
+	var serializedSong *re.SongJson
 	if post.SongId.Valid {
 		song := songsById[post.SongId.Int32]
 		serialized := serializeSong(song)
 		serializedSong = &serialized
 	}
 
-	var serializedMixtape *r.MixtapePreviewJson
+	var serializedMixtape *re.MixtapePreviewJson
 	if post.MixtapeId.Valid {
 		mixtape := mixtapesById[post.MixtapeId.Int32]
 		serialized := serializeMixtape(mixtape)
@@ -70,21 +70,21 @@ func getPostRelationsFromMaps(
 	return serializedSong, serializedMixtape
 }
 
-func serializeSong(song models.SongWithMeta) r.SongJson {
-	songJson := r.SongJson{
+func serializeSong(song models.SongWithMeta) re.SongJson {
+	songJson := re.SongJson{
 		SongWithMeta: song,
 	}
 
 	return songJson
 }
 
-func serializeMixtape(mixtape models.MixtapePreview) r.MixtapePreviewJson {
-	return r.MixtapePreviewJson{
+func serializeMixtape(mixtape models.MixtapePreview) re.MixtapePreviewJson {
+	return re.MixtapePreviewJson{
 		MixtapePreview: mixtape,
 	}
 }
 
-func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestamp *time.Time) []r.FeedItemJson {
+func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestamp *time.Time) []re.FeedItemJson {
 	posts := store.GetAggregatedPublicPosts(beforeTimestamp, afterTimestamp, 20)
 
 	// cast []posts -> []postsWithConnections interface
@@ -95,10 +95,10 @@ func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestam
 	}
 
 	songsById, mixtapesById := getRelationsForPosts(store, postsWithConnections)
-	feedItems := []r.FeedItemJson{}
+	feedItems := []re.FeedItemJson{}
 
 	for _, post := range posts {
-		item := r.FeedItemJson{
+		item := re.FeedItemJson{
 			Timestamp: post.Timestamp,
 			UserNames: post.UserNames,
 		}
@@ -113,7 +113,7 @@ func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestam
 	return feedItems
 }
 
-func GetUserPlaylist(store *store.Store, userId int32, beforeTimestamp *time.Time, afterTimestamp *time.Time) []r.PlaylistItemJson {
+func GetUserPlaylist(store *store.Store, userId int32, beforeTimestamp *time.Time, afterTimestamp *time.Time) []re.PlaylistItemJson {
 	posts := store.GetUserPostsByUserId(userId, beforeTimestamp, afterTimestamp, 20)
 
 	// cast []posts -> []postsWithConnections interface
@@ -124,10 +124,10 @@ func GetUserPlaylist(store *store.Store, userId int32, beforeTimestamp *time.Tim
 	}
 
 	songsById, mixtapesById := getRelationsForPosts(store, postsWithConnections)
-	playlistItems := []r.PlaylistItemJson{}
+	playlistItems := []re.PlaylistItemJson{}
 
 	for _, post := range posts {
-		item := r.PlaylistItemJson{
+		item := re.PlaylistItemJson{
 			Timestamp: post.Timestamp,
 		}
 
