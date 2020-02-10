@@ -1,5 +1,5 @@
-this is a bad idea
+an experiment in a go backend for jam buds
 
-```
-curl http://localhost:3333/public-feed | jq "."
-```
+### why?
+
+i kind of hate go, so this is a good question! 

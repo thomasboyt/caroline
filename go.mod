@@ -3,6 +3,7 @@ module github.com/thomasboyt/jam-buds-golang
 go 1.13
 
 require (
+	github.com/DATA-DOG/go-txdb v0.1.3
 	github.com/Rican7/conjson v0.1.0
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-chi/render v1.0.1
