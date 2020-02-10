@@ -36,8 +36,19 @@ func parseTimestamps(query url.Values) (*time.Time, *time.Time, *ErrResponse) {
 	return beforeTimestamp, afterTimestamp, nil
 }
 
+func getCurrentUserId(r *http.Request) int32 {
+	var currentUserId int32
+	currentUserId = -1
+	currentUser := GetCurrentUserFromContext(r.Context())
+	if currentUser != nil {
+		currentUserId = currentUser.Id
+	}
+	return currentUserId
+}
+
 func (a *API) GetPublicFeedHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		currentUserId := getCurrentUserId(r)
 		query := r.URL.Query()
 
 		beforeTimestamp, afterTimestamp, err := parseTimestamps(query)
@@ -46,7 +57,11 @@ func (a *API) GetPublicFeedHandler() http.HandlerFunc {
 			return
 		}
 
-		feedItems := services.GetPublicFeed(a.store, beforeTimestamp, afterTimestamp)
+		feedItems := services.GetPublicFeed(a.store, services.PlaylistArgs{
+			BeforeTimestamp: beforeTimestamp,
+			AfterTimestamp:  afterTimestamp,
+			CurrentUserId:   currentUserId,
+		})
 
 		RenderConjson(w, r, feedItems)
 	}
@@ -54,6 +69,7 @@ func (a *API) GetPublicFeedHandler() http.HandlerFunc {
 
 func (a *API) GetUserPlaylist() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		currentUserId := getCurrentUserId(r)
 		userName := chi.URLParam(r, "userName")
 		userProfile := services.GetUserProfileByUserName(a.store, userName)
 
@@ -71,7 +87,11 @@ func (a *API) GetUserPlaylist() http.HandlerFunc {
 			return
 		}
 
-		feedItems := services.GetUserPlaylist(a.store, userProfile.Id, beforeTimestamp, afterTimestamp)
+		feedItems := services.GetUserPlaylist(a.store, userProfile.Id, services.PlaylistArgs{
+			BeforeTimestamp: beforeTimestamp,
+			AfterTimestamp:  afterTimestamp,
+			CurrentUserId:   currentUserId,
+		})
 
 		resp := re.PlaylistJson{
 			Items:       feedItems,

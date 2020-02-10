@@ -8,7 +8,11 @@ import (
 	"github.com/thomasboyt/caroline/store"
 )
 
-const CURRENT_USER_ID_PLACEHOLDER = 4
+type PlaylistArgs struct {
+	BeforeTimestamp *time.Time
+	AfterTimestamp  *time.Time
+	CurrentUserId   int32
+}
 
 func mapSongsById(songs []models.SongWithMeta) map[int32]models.SongWithMeta {
 	m := make(map[int32]models.SongWithMeta)
@@ -26,7 +30,7 @@ func mapMixtapesById(mixtapes []models.MixtapePreview) map[int32]models.MixtapeP
 	return m
 }
 
-func getRelationsForPosts(store *store.Store, posts []models.PostWithConnections) (map[int32]models.SongWithMeta, map[int32]models.MixtapePreview) {
+func getRelationsForPosts(store *store.Store, posts []models.PostWithConnections, playlistArgs PlaylistArgs) (map[int32]models.SongWithMeta, map[int32]models.MixtapePreview) {
 	songIds := make([]int32, 0)
 	mixtapeIds := make([]int32, 0)
 	for _, post := range posts {
@@ -38,7 +42,7 @@ func getRelationsForPosts(store *store.Store, posts []models.PostWithConnections
 		}
 	}
 
-	songs := store.GetSongsByIdList(songIds, CURRENT_USER_ID_PLACEHOLDER)
+	songs := store.GetSongsByIdList(songIds, playlistArgs.CurrentUserId)
 	songsById := mapSongsById(songs)
 
 	mixtapes := store.GetMixtapePreviewsByIdList(mixtapeIds)
@@ -84,8 +88,8 @@ func serializeMixtape(mixtape models.MixtapePreview) re.MixtapePreviewJson {
 	}
 }
 
-func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestamp *time.Time) []re.FeedItemJson {
-	posts := store.GetAggregatedPublicPosts(beforeTimestamp, afterTimestamp, 20)
+func GetPublicFeed(store *store.Store, playlistArgs PlaylistArgs) []re.FeedItemJson {
+	posts := store.GetAggregatedPublicPosts(playlistArgs.BeforeTimestamp, playlistArgs.AfterTimestamp, 20)
 
 	// cast []posts -> []postsWithConnections interface
 	// https://stackoverflow.com/questions/12994679/slice-of-struct-slice-of-interface-it-implements
@@ -94,7 +98,7 @@ func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestam
 		postsWithConnections[i] = post
 	}
 
-	songsById, mixtapesById := getRelationsForPosts(store, postsWithConnections)
+	songsById, mixtapesById := getRelationsForPosts(store, postsWithConnections, playlistArgs)
 	feedItems := []re.FeedItemJson{}
 
 	for _, post := range posts {
@@ -113,8 +117,8 @@ func GetPublicFeed(store *store.Store, beforeTimestamp *time.Time, afterTimestam
 	return feedItems
 }
 
-func GetUserPlaylist(store *store.Store, userId int32, beforeTimestamp *time.Time, afterTimestamp *time.Time) []re.PlaylistItemJson {
-	posts := store.GetUserPostsByUserId(userId, beforeTimestamp, afterTimestamp, 20)
+func GetUserPlaylist(store *store.Store, userId int32, playlistArgs PlaylistArgs) []re.PlaylistItemJson {
+	posts := store.GetUserPostsByUserId(userId, playlistArgs.BeforeTimestamp, playlistArgs.AfterTimestamp, 20)
 
 	// cast []posts -> []postsWithConnections interface
 	// https://stackoverflow.com/questions/12994679/slice-of-struct-slice-of-interface-it-implements
@@ -123,7 +127,7 @@ func GetUserPlaylist(store *store.Store, userId int32, beforeTimestamp *time.Tim
 		postsWithConnections[i] = post
 	}
 
-	songsById, mixtapesById := getRelationsForPosts(store, postsWithConnections)
+	songsById, mixtapesById := getRelationsForPosts(store, postsWithConnections, playlistArgs)
 	playlistItems := []re.PlaylistItemJson{}
 
 	for _, post := range posts {

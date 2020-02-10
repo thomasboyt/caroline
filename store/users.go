@@ -31,3 +31,24 @@ func (s *Store) GetUserByUserName(userName string) *models.User {
 
 	return &user
 }
+
+func (s *Store) GetUserByAuthToken(authToken string) *models.User {
+	user := models.User{}
+
+	err := s.db.Get(&user, `
+		select users.*
+		from users
+		join auth_tokens
+		on auth_tokens.user_id = users.id
+		where auth_token = $1
+	`, authToken)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+		log.Panic(err)
+	}
+
+	return &user
+}

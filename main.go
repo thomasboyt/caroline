@@ -36,8 +36,10 @@ func main() {
 
 	dsn := os.Getenv("DATABASE_URL")
 	store := store.New(dsn)
-
 	a := api.New(store)
+
+	r.Use(a.AuthMiddleware)
+
 	a.RegisterRoutes(r)
 
 	log.Println("Server starting on port 3333")
