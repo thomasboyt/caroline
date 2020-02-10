@@ -3,9 +3,9 @@ package services
 import (
 	"time"
 
-	"github.com/thomasboyt/jam-buds-golang/models"
-	re "github.com/thomasboyt/jam-buds-golang/resources"
-	"github.com/thomasboyt/jam-buds-golang/store"
+	"github.com/thomasboyt/caroline/models"
+	re "github.com/thomasboyt/caroline/resources"
+	"github.com/thomasboyt/caroline/store"
 )
 
 const CURRENT_USER_ID_PLACEHOLDER = 4

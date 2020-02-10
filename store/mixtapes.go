@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/thomasboyt/jam-buds-golang/models"
+	"github.com/thomasboyt/caroline/models"
 )
 
 func (s *Store) GetMixtapePreviewsByIdList(mixtapeIds []int32) []models.MixtapePreview {

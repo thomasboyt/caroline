@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	re "github.com/thomasboyt/jam-buds-golang/resources"
-	"github.com/thomasboyt/jam-buds-golang/services"
+	re "github.com/thomasboyt/caroline/resources"
+	"github.com/thomasboyt/caroline/services"
 )
 
 func parseTimestamp(query url.Values, name string) (*time.Time, *ErrResponse) {

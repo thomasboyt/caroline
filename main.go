@@ -11,8 +11,8 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 
-	"github.com/thomasboyt/jam-buds-golang/api"
-	"github.com/thomasboyt/jam-buds-golang/store"
+	"github.com/thomasboyt/caroline/api"
+	"github.com/thomasboyt/caroline/store"
 )
 
 func main() {

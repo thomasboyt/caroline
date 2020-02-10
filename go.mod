@@ -1,4 +1,4 @@
-module github.com/thomasboyt/jam-buds-golang
+module github.com/thomasboyt/caroline
 
 go 1.13
 

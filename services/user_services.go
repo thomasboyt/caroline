@@ -1,8 +1,8 @@
 package services
 
 import (
-	re "github.com/thomasboyt/jam-buds-golang/resources"
-	"github.com/thomasboyt/jam-buds-golang/store"
+	re "github.com/thomasboyt/caroline/resources"
+	"github.com/thomasboyt/caroline/store"
 )
 
 func GetUserProfileByUserName(s *store.Store, userName string) *re.UserProfileJson {

@@ -1,6 +1,6 @@
 package api
 
-import "github.com/thomasboyt/jam-buds-golang/store"
+import "github.com/thomasboyt/caroline/store"
 
 type API struct {
 	store *store.Store

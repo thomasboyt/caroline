@@ -3,7 +3,7 @@ package resources
 import (
 	"time"
 
-	"github.com/thomasboyt/jam-buds-golang/models"
+	"github.com/thomasboyt/caroline/models"
 )
 
 type SongJson struct {

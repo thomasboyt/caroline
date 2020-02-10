@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/thomasboyt/jam-buds-golang/models"
+	"github.com/thomasboyt/caroline/models"
 )
 
 func (s *Store) GetAggregatedPublicPosts(

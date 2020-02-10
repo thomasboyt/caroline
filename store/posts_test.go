@@ -3,7 +3,7 @@ package store
 import (
 	"testing"
 
-	"github.com/thomasboyt/jam-buds-golang/models"
+	"github.com/thomasboyt/caroline/models"
 )
 
 func TestGetAggregatedPublicPosts(t *testing.T) {

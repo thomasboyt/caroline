@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/thomasboyt/jam-buds-golang/models"
+	"github.com/thomasboyt/caroline/models"
 )
 
 func (s *Store) GetUserByUserName(userName string) *models.User {
